@@ -1,4 +1,4 @@
-package org.example.ui;
+package org.example.intervalOptimization.ui;
 
 import java.util.HashMap;
 import java.util.Map;
