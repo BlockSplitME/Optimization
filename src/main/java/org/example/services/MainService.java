@@ -25,9 +25,8 @@ public class MainService {
     public void post() {
 //        lab1();
 //        lab2();
-//        lab3();
-        lab4();
-//        lab5();
+        lab3();
+//        lab4();
 
     }
     private void lab1() {
@@ -53,9 +52,12 @@ public class MainService {
         double borderTime = org.example.structuralOptimization.configurations.Parameters.borderTime;
         ArrayList<Double> factor = org.example.structuralOptimization.configurations.Parameters.k;
         String fileName = org.example.structuralOptimization.configurations.Parameters.fileName;
-
+        double[] eVector = org.example.structuralOptimization.configurations.Parameters.eVector;
         factor.forEach(k -> {
-            System.out.println("k = "+ k + ":\n" + RecurrentProcedure.getResult(costOfNodes, serviceTime, borderTime * k, FileUtil.parseFileMatrix(fileName)));
+            System.out.println("k = " + k);
+            RecurrentProcedure.getResult(costOfNodes, serviceTime, borderTime * k, FileUtil.parseFileMatrix(fileName), eVector).forEach(node ->
+                    System.out.println("Node " + node.getNumber() + ": K = " + node.getK() + "; cost = " + node.getCost() + "; e = " + node.getE()));
+            System.out.println();
         });
     }
     private void lab4() {
@@ -64,12 +66,7 @@ public class MainService {
         double a0 = org.example.pointEstimationOptimization.configurations.Parameters.a0;
         double b0 = org.example.pointEstimationOptimization.configurations.Parameters.b0;
         double deltaX  = org.example.pointEstimationOptimization.configurations.Parameters.deltaX;
-        this.pointEstimationOptimization.forEach(method -> delta.forEach(del -> {
-            System.out.println(method.getName() + "(del= " + del + "):" + method.getResult(a0, b0, deltaX, del));
-        }));
-    }
-    private void lab5() {
-        System.out.println("\n---------------------------Lab5---------------------------------\n");
-
+        this.pointEstimationOptimization.forEach(method -> delta.forEach(del ->
+                System.out.println(method.getName() + "(del= " + del + "):" + method.getResult(a0, b0, deltaX, del))));
     }
 }

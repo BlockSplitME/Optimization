@@ -1,6 +1,5 @@
 package org.example.structuralOptimization.configurations;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class Parameters {
@@ -9,6 +8,6 @@ public class Parameters {
     public static final double borderTime = 0.65;
     public static final ArrayList<Double> k = new ArrayList<>(){{add(1.0); add(0.5);add(1.7);}};
     public static final String fileName = "src/resources/GraphProbabilityMatrix.txt";
-
+    public static double[] eVector = {1/3.8, 1/3.8, 0.8/3.8, 0.8/3.8, 0.2/3.8};
     public static final double eps = 0.9;
 }

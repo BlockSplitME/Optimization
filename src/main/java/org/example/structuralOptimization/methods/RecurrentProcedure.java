@@ -4,35 +4,28 @@ import org.example.structuralOptimization.configurations.Parameters;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
 
 @Component
 public class RecurrentProcedure {
-    public static Map<String, Double> getResult(ArrayList<Double> costOf, ArrayList<Double> serviceTime, double borderTime, ArrayList<ArrayList<Double>> probabilityMatrix) {
-        Map<String, Double> result = new HashMap<>();
-        TreeSet<Node> nodes = initSystem(costOf, serviceTime, probabilityMatrix);
-
+    public static ArrayList<Node> getResult(ArrayList<Double> costOf, ArrayList<Double> serviceTime, double borderTime, ArrayList<ArrayList<Double>> probabilityMatrix, double[] eVector) {
+        ArrayList<Node> nodes = initSystem(costOf, serviceTime, probabilityMatrix, eVector);
         optimization(nodes, borderTime);
-        System.out.println(nodes);
-
-        return result;
+        return nodes;
     }
 
-    private static TreeSet<Node> initSystem(ArrayList<Double> costOf, ArrayList<Double> serviceTime, ArrayList<ArrayList<Double>> probabilityMatrix) {
-        return new TreeSet<>() {{
+    private static ArrayList<Node> initSystem(ArrayList<Double> costOf, ArrayList<Double> serviceTime, ArrayList<ArrayList<Double>> probabilityMatrix, double[] eVector) {
+        return new ArrayList<>() {{
             for (int i = 0; i < serviceTime.size(); i++) {
                 if (i == 0) {
-                    this.add(new Node(i + 1, 4, serviceTime.get(i), 0, probabilityMatrix.get(i)));
+                    this.add(new Node(i + 1, 4, serviceTime.get(i), 0, probabilityMatrix.get(i), eVector[i]));
                 } else {
-                    this.add(new Node(i + 1, 1, serviceTime.get(i), costOf.get(i - 1), probabilityMatrix.get(i)));
+                    this.add(new Node(i + 1, 1, serviceTime.get(i), costOf.get(i - 1), probabilityMatrix.get(i), eVector[i]));
                 }
             }
         }};
     }
 
-    private static void optimization(TreeSet<Node> nodes, double border) {
+    private static void optimization(ArrayList<Node> nodes, double border) {
         int nTasks = 1;
 
         while (true) {
@@ -40,7 +33,7 @@ public class RecurrentProcedure {
             ArrayList<Double> eV = new ArrayList<>();
 
             nodes.forEach(node -> {
-                double e = e(node.getProbabilities());
+                double e = e(node.getProbabilities(), node.getE());
                 averageTimeV.add(getAverageTime(node.getServiceTime(), nTasks, node.getK(), e, 0));
                 eV.add(e);
             });
@@ -51,16 +44,14 @@ public class RecurrentProcedure {
             if (resTime <= border) {
                 break;
             } else {
-                nodes.first().incrementK();
+                searchMinCostNode(nodes).incrementK();
             }
         }
-
-
     }
-
     private static double getAverageTime(double serviceTime, double j, int K, double e, double time) {
         double newTime = serviceTime * (1 + (getL(e, j - 1) / K));
-        if (j != 1 && ((j - 1) / time) / (j / newTime) >= Parameters.eps) {
+        double exit = ((j - 1) / time) / (j / newTime);
+        if (j != 1 && exit > Parameters.eps && exit < 1) {
             return newTime;
         }
         return getAverageTime(serviceTime, ++j, K, e, newTime);
@@ -69,11 +60,18 @@ public class RecurrentProcedure {
     private static double getL(double e, double j) {
         return e * j;
     }
-    private static double e(ArrayList<Double> raw) {
+    private static double e(ArrayList<Double> raw, double e) {
         double sum = 0;
-        double e = (double) 1 / raw.size();
         for (Double p : raw) sum += p * e;
         return sum;
     }
-
+    private static Node searchMinCostNode(ArrayList<Node> nodes) {
+        Node res = nodes.get(1);
+        for(Node node: nodes){
+            if(node.getCost() < res.getCost() && node.getNumber() != 1) {
+                res = node;
+            }
+        }
+        return res;
+    }
 }

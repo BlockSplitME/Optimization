@@ -12,29 +12,18 @@ import java.util.Comparator;
 @Setter
 @ToString
 @AllArgsConstructor
-public class Node implements Comparator, Comparable{
+public class Node {
     private int number;
     private int K;
     private double serviceTime;
     private double cost;
     private ArrayList<Double> probabilities;
+    private double e;
     public void incrementK() {
         this.setK(this.getK() + 1);
     }
-    @Override
-    public int compareTo(Object o) {
-        return compare(this, o);
+    public double getCost() {
+        return cost * K;
     }
 
-    @Override
-    public int compare(Object o1, Object o2) {
-        Node n1 = (Node) o1;
-        Node n2 = (Node) o2;
-        if(n1.number == 1) {
-            return 1;
-        } else if (n2.number == 1) {
-            return -1;
-        }
-        return (n1.getCost() > n2.getCost()) ? 1 : -1;
-    }
 }
